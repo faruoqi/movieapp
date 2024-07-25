@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/faruoqi/movieapp/metadata/internal/controller/metadata"
-	"github.com/faruoqi/movieapp/metadata/internal/repository"
 	"log"
 	"net/http"
 )
@@ -17,7 +16,7 @@ func New(ctrl *metadata.Controller) *Handler {
 	return &Handler{ctrl: ctrl}
 }
 
-func (h Handler) GetMetadata(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) GetMetadata(w http.ResponseWriter, req *http.Request) {
 	id := req.FormValue("id")
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -25,7 +24,7 @@ func (h Handler) GetMetadata(w http.ResponseWriter, req *http.Request) {
 	}
 	ctx := req.Context()
 	m, err := h.ctrl.Get(ctx, id)
-	if err != nil && errors.Is(err, repository.ErrNotFound) {
+	if err != nil && errors.Is(err, metadata.ErrNotFound) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
